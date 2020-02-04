@@ -325,21 +325,6 @@ else
 
 # Right number of arguments (therefore NoA :-)) )
 
-# Define some thresholds
-   # If it is not handled over via commandline get it from the system
-   if (!$SFP_TempHigh) {
-      $oid = ".1.3.6.1.4.1.1588.2.1.1.1.10.2.1.6.4";
-      $result = get_request();
-      $SFP_TempHigh = $$result{$oid};
-   }
-   # Now we calculate the warning temperature
-   if (!$SFP_TempHighWarn) {
-      $SFP_TempHighWarn = $SFP_TempHigh - $SFP_TempHighWarn_def;
-   } else {
-      $SFP_TempHighWarn = $SFP_TempHigh - $SFP_TempHighWarn;
-   } 
-   
-
 if ( $NoA == -1 )
    {
    usage();
@@ -561,6 +546,24 @@ if (!defined($session))
    print "Exiting\n";
    exit 1;
    }
+
+# Define some thresholds
+   # If it is not handled over via commandline get it from the system
+   # This does not work. Default will be set
+   if (!$SFP_TempHigh) {
+      $oid = ".1.3.6.1.4.1.1588.2.1.1.1.10.2.1.6.4";
+      $result = get_request();
+      $SFP_TempHigh = $$result{$oid};
+      #Dirty workaround
+      $SFP_TempHigh = 65;
+   }
+   # Now we calculate the warning temperature
+   if (!$SFP_TempHighWarn) {
+      $SFP_TempHighWarn = $SFP_TempHigh - $SFP_TempHighWarn_def;
+   } else {
+      $SFP_TempHighWarn = $SFP_TempHigh - $SFP_TempHighWarn;
+   } 
+
 
 # If we wanna get the system status here is the starting point
 if ($systeminfo)
@@ -1087,25 +1090,6 @@ sub get_sfp_temp()
        print "No Fabric Watch license enabled. SFP temperature monitoring needs an enabled FW license.\n";
        exit 1;
        }
-
-    # If it is not handled over via commandline get it from the system
-    if (!$SFP_TempHigh)
-       {
-       $oid = ".1.3.6.1.4.1.1588.2.1.1.1.10.2.1.6.4";
-       $result = get_request();
-       $SFP_TempHigh = $$result{$oid};
-       }
-
-    # Now we calculate the warning temperature
-    if (!$SFP_TempHighWarn)
-       {
-       $SFP_TempHighWarn = $SFP_TempHigh - $SFP_TempHighWarn_def;
-       }
-    else
-       {
-       $SFP_TempHighWarn = $SFP_TempHigh - $SFP_TempHighWarn;
-       }
-   
    
     $oid = ".1.3.6.1.4.1.1588.2.1.1.1.10.3.1.5.4";
     $result = get_table();
